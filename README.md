@@ -1,25 +1,31 @@
-# MemeLab
+# MemeLab v0.3
 
 Terminal de pesquisa de tokens Solana, sem execução de ordens.
 
-- [Aplicação](https://memelab.mcpe3004.workers.dev/)
-- `/api/health`: status e versão.
-- `/api/scanner`: até 30 endereços Solana dos perfis recentes do DexScreener, com métricas do par de maior liquidez encontrado. Não é um feed completo de lançamentos nem um detector de golpes.
-- Cache de 60 segundos; atualização da interface a cada minuto quando visível.
-- Watchlist local ao navegador, limitada aos tokens do feed atual.
-- Dados ausentes são apresentados como indisponíveis. Compras/vendas são contagens de transações, não de carteiras únicas.
+[Aplicação](https://memelab.mcpe3004.workers.dev/)
+
+## API
+
+- `/api/health`: versão e teste de conexão D1.
+- `/api/scanner`: até 90 endereços deduplicados dos perfis recentes, boosts recentes e top boosts DexScreener. Boosts são publicidade, não qualidade ou recomendação. Não cobre todos os lançamentos. Cache de 60 segundos; resposta indica `partial` se uma fonte de descoberta falhar.
+- `/api/history`: contagem e horário do último snapshot armazenado.
+- `/api/wallet/{address}`: saldo SOL e até 15 transações confirmadas via RPC público Solana, cache de 120 segundos. Não classifica swaps nem calcula PnL. RPC sujeito a limites e bloqueios.
+
+## Persistência
+
+D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.sql`. Cron `*/5 * * * *` coleta snapshots completos e não vazios, deduplicados por intervalo de cinco minutos; retenção aproximada de sete dias. Watchlists de tokens e carteiras ficam no navegador, não no D1. A watchlist de tokens mostra somente o feed atual.
 
 ## Deploy
 
-O módulo `worker.mjs` é o código publicado no Cloudflare Worker `memelab`. Deploy manual via API, ainda sem integração contínua. Não há credenciais no código. Não inserir chaves privadas, seed phrases ou tokens de API no Git.
+`worker.mjs` é o módulo publicado. Deploy manual via Cloudflare API; ainda sem CI. Nenhuma chave ou credencial no código. Não inserir seed phrases ou chaves privadas.
 
 ## Roadmap
 
-P0: ampliar descoberta de tokens, persistência da watchlist e validação ponta a ponta.
-P1: histórico e monitoramento de carteiras.
-P2: indicadores de risco on-chain.
+P0: coleta e scanner, validação ponta a ponta e descoberta mais abrangente.
+P1: classificação de swaps, histórico de operações e PnL verificável, alertas.
+P2: indicadores de risco.
 P3: narrativas.
 P4: simulador e diário.
 P5: copiloto de estudo.
 
-Dados de mercado não são recomendações de investimento.
+Dados não constituem recomendações de investimento.
