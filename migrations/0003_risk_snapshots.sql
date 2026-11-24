@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS risk_snapshots (mint TEXT NOT NULL, bucket INTEGER NOT NULL, captured_at TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(mint,bucket)); CREATE INDEX IF NOT EXISTS risk_snapshots_recent ON risk_snapshots(captured_at);
