@@ -1,4 +1,4 @@
-# MemeLab v0.5
+# MemeLab v0.6
 
 Terminal de pesquisa de tokens Solana, sem execução de ordens.
 
@@ -15,9 +15,11 @@ Terminal de pesquisa de tokens Solana, sem execução de ordens.
 
 - `/api/risk/{mint}`: autoridades de emissão e congelamento, concentração bruta das 10/20 maiores contas SPL e liquidez do maior par DexScreener. Não identifica beneficiários, insiders ou liquidez bloqueada; extensões Token-2022 não são analisadas completamente. Dados parciais explícitos; cache de 180 segundos. Limiar de US$10 mil e concentração de 50% são heurísticas de triagem, não certificação de risco.
 
+- Narrative Intelligence: grupos heurísticos pelo nome/símbolo e classificação manual local, com contagem, soma de volumes 24h conhecidos e mediana da variação 5m. Não monitora redes sociais nem estima fluxos líquidos de capital.
+
 ## Persistência
 
-D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.sql`. Cron `*/5 * * * *` coleta snapshots não vazios, inclusive parciais identificados no payload, deduplicados por intervalo de cinco minutos; retenção aproximada de sete dias. Aplicar também `migrations/0002_collection_runs.sql` para registrar tentativas de coleta, inclusive falhas. `/api/history` retorna a última execução registrada. Watchlists de tokens e carteiras ficam no navegador, não no D1. A watchlist de tokens mostra somente o feed atual.
+D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.sql`. Cron `*/5 * * * *` coleta snapshots não vazios, inclusive parciais identificados no payload, deduplicados por intervalo de cinco minutos; retenção aproximada de sete dias. Aplicar também `migrations/0002_collection_runs.sql` para registrar tentativas de coleta, inclusive falhas. `/api/history` retorna a última execução registrada. Aplicar `migrations/0003_risk_snapshots.sql`. O scanner grava snapshots também no acesso web (deduplicados por 5 minutos); a investigação de risco registra até 30 tokens distintos por hora, um registro por mint/hora, retenção aproximada de sete dias com limpeza em novas consultas de risco. Respostas indicam disponibilidade da persistência; `stored-or-existing` pode representar um snapshot anterior no intervalo, não o clique atual. `/api/history` inclui contagem de investigações e horário da última. Classificações manuais de narrativas ficam no navegador. Watchlists de tokens e carteiras ficam no navegador, não no D1. A watchlist de tokens mostra somente o feed atual.
 
 ## Deploy
 
@@ -28,7 +30,7 @@ D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.s
 P0: coleta e scanner, validação ponta a ponta e descoberta mais abrangente.
 P1: análise inicial de fluxo implementada; falta confirmação por programas DEX, histórico paginado, PnL verificável e alertas.
 P2: Risk Lab inicial implementado; falta resolver proprietários e pools, extensões, histórico de distribuição e conexões entre carteiras.
-P3: narrativas.
+P3: agrupamento heurístico inicial e classificação manual implementados; falta monitoramento social e séries históricas de narrativas.
 P4: simulador e diário.
 P5: copiloto de estudo.
 
