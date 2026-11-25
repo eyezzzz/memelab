@@ -1,4 +1,4 @@
-# MemeLab v0.9
+# MemeLab v0.10
 
 Terminal de pesquisa de tokens Solana, sem execução de ordens.
 
@@ -25,6 +25,8 @@ Terminal de pesquisa de tokens Solana, sem execução de ordens.
 - `/api/data-quality`: contagens de coletas finalizadas nas últimas 24h, últimas 20 execuções e metadados do snapshot mais recente. Registra falhas por fonte/lote; diagnósticos anteriores continuam genéricos.
 - Data Engine: tentativas limitadas para falhas transitórias (sem retry imediato de HTTP 429), resultados parciais por lote, cobertura de preços e fallback histórico de até 24h claramente marcado no scanner. O fallback não é utilizado por `/api/quotes` do simulador. Snapshots sem preço utilizável não são armazenados. Persistência tenta privilegiar maior cobertura ou substituição de parcial por completo no mesmo intervalo.
 
+- `/api/smart-history/{address}?before=...`: páginas independentes de até 12 assinaturas, detalhes RPC público e evidência de chamada aos programas Jupiter v6, Raydium AMM v4, CPMM e CLMM. Classificação heurística por deltas líquidos SPL de carteira signatária, não decodificação completa das instruções de swap. Possíveis operações com SOL nativo são separadas e não conciliadas. FIFO de custo em USDC ou wSOL somente quando estoque inicial zero observado e saldos/contrapartida rastreáveis na página. Lacunas, mudanças não classificadas e moedas de contrapartida diferentes invalidam estoque conhecido. Resultado bruto estimado, exclui taxas de rede em SOL, não representa PnL total nem ranking de rentabilidade. Comparação local em memória de até cinco carteiras por amostras, coincidências de mints não provam simultaneidade nem coordenação.
+
 ## Persistência
 
 D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.sql`. Cron `*/5 * * * *` coleta snapshots não vazios, inclusive parciais identificados no payload, deduplicados por intervalo de cinco minutos; retenção aproximada de sete dias. Aplicar também `migrations/0002_collection_runs.sql` para registrar tentativas de coleta, inclusive falhas. `/api/history` retorna a última execução registrada. Aplicar `migrations/0003_risk_snapshots.sql`. O scanner grava snapshots também no acesso web (deduplicados por 5 minutos); a investigação de risco registra até 30 tokens distintos por hora, um registro por mint/hora, retenção aproximada de sete dias com limpeza em novas consultas de risco. Respostas indicam disponibilidade da persistência; `stored-or-existing` pode representar um snapshot anterior no intervalo, não o clique atual. `/api/history` inclui contagem de investigações e horário da última. Classificações manuais de narrativas ficam no navegador. Watchlists de tokens e carteiras ficam no navegador, não no D1. A watchlist de tokens mostra somente o feed atual.
@@ -36,7 +38,7 @@ D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.s
 ## Roadmap
 
 P0: coleta e scanner, validação ponta a ponta e descoberta mais abrangente.
-P1: análise inicial de fluxo implementada; falta confirmação por programas DEX, histórico paginado, PnL verificável e alertas.
+P1: análise de fluxo, paginação, evidência de programas e FIFO conservador por página implementados; falta decodificação integral de swaps, histórico contínuo, reconciliação SOL nativo, taxas e monitoramento persistente.
 P2: Risk Lab inicial implementado; falta resolver proprietários e pools, extensões, histórico de distribuição e conexões entre carteiras.
 P3: agrupamento heurístico inicial e classificação manual implementados; falta monitoramento social e séries históricas de narrativas.
 P4: simulador e diário locais implementados; falta validação de execução e dados, replay e sincronização autenticada.
