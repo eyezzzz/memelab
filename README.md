@@ -1,4 +1,4 @@
-# MemeLab v0.7
+# MemeLab v0.8
 
 Terminal de pesquisa de tokens Solana, sem execução de ordens.
 
@@ -20,6 +20,8 @@ Terminal de pesquisa de tokens Solana, sem execução de ordens.
 - `/api/quotes?mints=...`: até 20 mints Solana válidos, preço indicativo e liquidez do maior par no DexScreener, cache de 15 segundos.
 - Paper Trading: banca virtual em USD (padrão US$1.000), compra pelo custo total, venda integral, taxas e slippage configuráveis, tese obrigatória na entrada, notas de saída, PnL realizado, win rate das posições fechadas, patrimônio marcado a mercado e drawdown observado. Limite de 20 posições e de 1% da liquidez informada por operação; modelo heurístico, não garantia de execução. Cotações ausentes ou vencidas impedem execução e patrimônio completo. Diário e curva de até 500 observações ficam no localStorage, com exportação JSON; não sincronizados entre dispositivos. Sem ordens reais, alavancagem, replay ou simulação de profundidade de livro.
 
+- Trading Copilot: treinador local baseado em regras (sem modelo generativo), revisão de risco e evidências, perguntas sobre tese e invalidação, cenários hipotéticos de perda sobre patrimônio virtual, revisão de diário (expectância, profit factor, médias, custos, duração, notas e drawdown), glossário e exportação JSON. Teses e notas não são enviadas ao servidor; apenas o mint é usado para consultar `/api/risk`. Não valida tese semântica, não prevê retornos, não gera sinais de negociação.
+
 ## Persistência
 
 D1 `memelab-db` vinculado como `DB`. Aplicar `migrations/0001_market_snapshots.sql`. Cron `*/5 * * * *` coleta snapshots não vazios, inclusive parciais identificados no payload, deduplicados por intervalo de cinco minutos; retenção aproximada de sete dias. Aplicar também `migrations/0002_collection_runs.sql` para registrar tentativas de coleta, inclusive falhas. `/api/history` retorna a última execução registrada. Aplicar `migrations/0003_risk_snapshots.sql`. O scanner grava snapshots também no acesso web (deduplicados por 5 minutos); a investigação de risco registra até 30 tokens distintos por hora, um registro por mint/hora, retenção aproximada de sete dias com limpeza em novas consultas de risco. Respostas indicam disponibilidade da persistência; `stored-or-existing` pode representar um snapshot anterior no intervalo, não o clique atual. `/api/history` inclui contagem de investigações e horário da última. Classificações manuais de narrativas ficam no navegador. Watchlists de tokens e carteiras ficam no navegador, não no D1. A watchlist de tokens mostra somente o feed atual.
@@ -35,6 +37,6 @@ P1: análise inicial de fluxo implementada; falta confirmação por programas DE
 P2: Risk Lab inicial implementado; falta resolver proprietários e pools, extensões, histórico de distribuição e conexões entre carteiras.
 P3: agrupamento heurístico inicial e classificação manual implementados; falta monitoramento social e séries históricas de narrativas.
 P4: simulador e diário locais implementados; falta validação de execução e dados, replay e sincronização autenticada.
-P5: copiloto de estudo.
+P5: treinador baseado em regras implementado; falta integração opcional com modelo generativo e validação ponta a ponta.
 
 Dados não constituem recomendações de investimento.
