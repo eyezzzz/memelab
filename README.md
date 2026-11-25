@@ -1,4 +1,4 @@
-# MemeLab v0.8
+# MemeLab v0.9
 
 Terminal de pesquisa de tokens Solana, sem execução de ordens.
 
@@ -21,6 +21,9 @@ Terminal de pesquisa de tokens Solana, sem execução de ordens.
 - Paper Trading: banca virtual em USD (padrão US$1.000), compra pelo custo total, venda integral, taxas e slippage configuráveis, tese obrigatória na entrada, notas de saída, PnL realizado, win rate das posições fechadas, patrimônio marcado a mercado e drawdown observado. Limite de 20 posições e de 1% da liquidez informada por operação; modelo heurístico, não garantia de execução. Cotações ausentes ou vencidas impedem execução e patrimônio completo. Diário e curva de até 500 observações ficam no localStorage, com exportação JSON; não sincronizados entre dispositivos. Sem ordens reais, alavancagem, replay ou simulação de profundidade de livro.
 
 - Trading Copilot: treinador local baseado em regras (sem modelo generativo), revisão de risco e evidências, perguntas sobre tese e invalidação, cenários hipotéticos de perda sobre patrimônio virtual, revisão de diário (expectância, profit factor, médias, custos, duração, notas e drawdown), glossário e exportação JSON. Teses e notas não são enviadas ao servidor; apenas o mint é usado para consultar `/api/risk`. Não valida tese semântica, não prevê retornos, não gera sinais de negociação.
+
+- `/api/data-quality`: contagens de coletas finalizadas nas últimas 24h, últimas 20 execuções e metadados do snapshot mais recente. Registra falhas por fonte/lote; diagnósticos anteriores continuam genéricos.
+- Data Engine: tentativas limitadas para falhas transitórias (sem retry imediato de HTTP 429), resultados parciais por lote, cobertura de preços e fallback histórico de até 24h claramente marcado no scanner. O fallback não é utilizado por `/api/quotes` do simulador. Snapshots sem preço utilizável não são armazenados. Persistência tenta privilegiar maior cobertura ou substituição de parcial por completo no mesmo intervalo.
 
 ## Persistência
 
